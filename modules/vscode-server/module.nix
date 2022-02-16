@@ -81,7 +81,8 @@ in
     };
   };
 
-  config = moduleConfig rec {
+  config = moduleConfig { inherit lib; } rec {
+    serviceEnabled = config.services.vscode-server.enable;
     name = "auto-fix-vscode-server";
     description = "Automatically fix the VS Code server used by the remote SSH extension";
     serviceConfig = {

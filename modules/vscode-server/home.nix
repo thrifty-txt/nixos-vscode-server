@@ -1,7 +1,8 @@
-import ./module.nix ({ name, description, serviceConfig, extensions }:
+import ./module.nix ({ lib, ... }:
+{ serviceEnabled, name, description, serviceConfig, extensions }:
 
 {
-  systemd.user.services.${name} = {
+  systemd.user.services.${name} = lib.attrsets.optionalAttrs serviceEnabled ({
     Unit = {
       Description = description;
     };
@@ -11,7 +12,7 @@ import ./module.nix ({ name, description, serviceConfig, extensions }:
     Install = {
       WantedBy = [ "default.target" ];
     };
-  };
+  });
 
   home.file = extensions;
 })
