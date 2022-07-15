@@ -1,5 +1,5 @@
 import ./module.nix ({ lib, ... }:
-{ serviceEnabled, name, description, serviceConfig, extensions }:
+{ serviceEnabled, name, description, serviceConfig, files }:
 
 {
   systemd.user.services.${name} = lib.attrsets.optionalAttrs serviceEnabled ({
@@ -14,5 +14,5 @@ import ./module.nix ({ lib, ... }:
     };
   });
 
-  home.file = extensions;
+  home.file = files;
 })

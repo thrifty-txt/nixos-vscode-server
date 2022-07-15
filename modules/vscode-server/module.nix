@@ -4,7 +4,11 @@ moduleConfig:
 with lib;
 
 let
+  jsonFormat = pkgs.formats.json { };
+
   extensionPath = ".vscode-server/extensions";
+  settingsPath = ".vscode-server/data/Machine/settings.json";
+  
   originalNodePackage = pkgs.nodejs-16_x;
 
   # Adapted from https://github.com/NixOS/nixpkgs/blob/nixos-unstable/pkgs/applications/editors/vscode/generic.nix#L181
@@ -79,6 +83,20 @@ in
         Wraps NodeJS in a Fhs compatible envrionment. Should allow for easy usage of extensions without nix-specific modifications. 
       '';
     };
+
+    settings = mkOption {
+      type = jsonFormat.type;
+      default = { };
+      example = literalExpression ''
+      {
+          "explorer.compactFolders" = true;
+      }
+      '';
+      description = ''
+      Configuration written to Visual Studio Code's
+      <filename>settings.json</filename>.
+      '';
+    };
   };
 
   config = moduleConfig { inherit lib; } rec {
@@ -123,7 +141,8 @@ in
     };
 
     # Adapted from https://github.com/nix-community/home-manager/blob/master/modules/programs/vscode.nix
-    extensions = mkMerge [
+    files = mkMerge [
+      # Extensions
       (mkIf (config.services.vscode-server.extensions != [ ]) (
       let
         combinedExtensionsDrv = pkgs.buildEnv {
@@ -145,6 +164,11 @@ in
       } else
         mkMerge (map addSymlinkToExtension extensions)
       ))
+
+      # Settings
+      (mkIf (config.services.vscode-server.settings != { }) {
+        "${settingsPath}".source = jsonFormat.generate "vscode-settings" config.services.vscode-server.settings;
+      })
     ];
   };
 }
