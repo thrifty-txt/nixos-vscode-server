@@ -20,7 +20,7 @@ let
       icu
       libunwind
       libuuid
-      openssl
+      openssl_1_1
       zlib
 
       # mono
